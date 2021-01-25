@@ -33,4 +33,3 @@ def way(level, start1, start2, finish1, finish2):
         return True
     else:
         return False
-        
