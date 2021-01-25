@@ -1,10 +1,9 @@
 import math
-
 import pygame
 import pygame.gfxdraw
-
 import setings as st
 from map import info_colis, worlds
+from random import randint
 
 pygame.init()
 disp = pygame.display.set_mode((st.width, st.height))
@@ -20,14 +19,19 @@ class Draw:
         self.texArray = pygame.PixelArray(self.well)
         self.dirX, self.dirY = 1.0, 0.0
         self.planeX, self.planeY = 0.0, 0.66
+        self.mat = randint(1, 20)
 
     def start_screen(self):
-        intro_text = ["ЗАСТАВКА", "",
-                    "Правила игры",
-                    "Если в правилах несколько строк,",
-                    "приходится выводить их построчно"]
+        if self.mat == 3:
+            intro_text = ['СПАСИБО ЗА 100 БАЛЛОВ','',
+                            'Делали эту хуйню',
+                            'Zeldini, sadfun, ArtiArtem']
+        else:
+            intro_text = ['СПАСИБО ЗА 100 БАЛЛОВ','',
+                        'Делали эту фигню',
+                        'Zeldini, sadfun, ArtiArtem']
 
-        fon = pygame.transform.scale(pygame.image.load('fon.jpg'), (st.width, st.height))
+        fon = pygame.transform.scale(pygame.image.load('fon.png'), (st.width, st.height))
         disp.blit(fon, (0, 0))
         font = pygame.font.Font(None, 30)
         text_coord = 50
