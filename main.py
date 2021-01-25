@@ -20,6 +20,25 @@ class Draw:
         self.texArray = pygame.PixelArray(self.well)
         self.dirX, self.dirY = 1.0, 0.0
         self.planeX, self.planeY = 0.0, 0.66
+
+    def start_screen(self):
+        intro_text = ["ЗАСТАВКА", "",
+                    "Правила игры",
+                    "Если в правилах несколько строк,",
+                    "приходится выводить их построчно"]
+
+        fon = pygame.transform.scale(pygame.image.load('fon.jpg'), (st.width, st.height))
+        disp.blit(fon, (0, 0))
+        font = pygame.font.Font(None, 30)
+        text_coord = 50
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('black'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            disp.blit(string_rendered, intro_rect)
     
     def ray_cast(self, player, disp, player_pos, player_angle):
         si = math.sin(st.player_angle)
@@ -92,37 +111,25 @@ class Player:
         
         if difference:
             self.angle += difference / 100
-        if pres[pygame.K_w]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0) 
+        if pres[pygame.K_w]: 
             dy = st.player_speed * si
             dx = st.player_speed * co
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
-        if pres[pygame.K_s]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0) 
+        if pres[pygame.K_s]: 
             dy = -st.player_speed * si
             dx = -st.player_speed * co
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
         if pres[pygame.K_d]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0) 
             dy = st.player_speed * co
             dx = -st.player_speed * si
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
-        if pres[pygame.K_a]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0) 
+        if pres[pygame.K_a]: 
             dy = -st.player_speed * co
             dx = st.player_speed * si
             if self.colis(dx, dy):
@@ -139,6 +146,9 @@ draw = Draw()
 
 while running:
     for event in pygame.event.get():
+        xf, yf = player.pos
+        if xf // 100 == 23 and yf // 100 == 13:
+            running = False
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYUP:
@@ -161,7 +171,30 @@ while running:
     '''pygame.draw.line(disp, pygame.Color('red'), player.pos, (player.x + st.width * math.cos(player.angle),
                                                              player.y + st.width * math.sin(player.angle)))'''
     for x, y in worlds:
-        pygame.draw.rect(disp, (0, 255, 0), (x // 10, y // 10, 10, 10), 2)
+        if x // 100 == 24 and y // 100 == 14:
+            pygame.draw.rect(disp, (255, 0, 0), (x // 10, y // 10, 10, 10))
+        else:
+            pygame.draw.rect(disp, (0, 255, 0), (x // 10, y // 10, 10, 10), 2)
     
+    pygame.display.flip()
+    clock.tick(st.fps)
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+            if event.key == pygame.K_q:
+                draw.magicvar = round(0.1 + draw.magicvar, 2)
+            print(draw.magicvar)
+            if event.key == pygame.K_e:
+                draw.magicvar = round(-0.1 + draw.magicvar, 2)
+            print(draw.magicvar)
+    disp.fill(pygame.Color('black'))
+
+    draw.start_screen()
     pygame.display.flip()
     clock.tick(st.fps)

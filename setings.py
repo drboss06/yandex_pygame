@@ -20,6 +20,6 @@ tx_scale = tx_width // 100
 
 player_pos = (112, 112)
 player_angle = 0
-player_speed = 2
+player_speed = 15
 
 fps = 30
