@@ -18,7 +18,7 @@ tx_width = 1200
 tx_hight = 1200
 tx_scale = tx_width // 100
 
-player_pos = (half_width, half_height + 20)
+player_pos = (112, 112)
 player_angle = 0
 player_speed = 2
 

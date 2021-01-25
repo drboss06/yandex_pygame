@@ -1,15 +1,13 @@
 import pygame
+from mazegen import generate
+from gen_map import way
 
-tx_map = [
-    '1111111111111111',
-    '1000000000111001',
-    '1000000000000001',
-    '1000011111000001',
-    '1000000000000001',
-    '1111100000000001',
-    '1011100000000001',
-    '1111111111111111',
-]
+while True:
+    
+    tx_map = generate(25, 15)
+    if way(tx_map, 2, 2, 24, 14):
+        break
+
 
 worlds = set()
 info_colis = []

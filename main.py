@@ -93,24 +93,36 @@ class Player:
         if difference:
             self.angle += difference / 100
         if pres[pygame.K_w]:
+            xf, yf = self.pos
+            if xf // 100 == 15 and yf // 100 == 5:
+                exit(0) 
             dy = st.player_speed * si
             dx = st.player_speed * co
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
         if pres[pygame.K_s]:
+            xf, yf = self.pos
+            if xf // 100 == 15 and yf // 100 == 5:
+                exit(0) 
             dy = -st.player_speed * si
             dx = -st.player_speed * co
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
         if pres[pygame.K_d]:
+            xf, yf = self.pos
+            if xf // 100 == 15 and yf // 100 == 5:
+                exit(0) 
             dy = st.player_speed * co
             dx = -st.player_speed * si
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
         if pres[pygame.K_a]:
+            xf, yf = self.pos
+            if xf // 100 == 15 and yf // 100 == 5:
+                exit(0) 
             dy = -st.player_speed * co
             dx = st.player_speed * si
             if self.colis(dx, dy):
@@ -144,12 +156,12 @@ while running:
     pygame.draw.rect(disp, (0, 186, 255), (0, 0, st.width, st.half_width))
     pygame.draw.rect(disp, (40, 40, 40), (0, st.half_height, st.width, st.half_width))
     draw.ray_cast(player, disp, player.pos, player.angle)
-    pygame.draw.rect(disp, pygame.Color('red'), (int(player.x) - 12, int(player.y) - 12, 24, 24))
-    pygame.draw.line(disp, pygame.Color('red'), player.pos,
-                     (player.x + st.width * math.cos(player.angle),
-                      player.y + st.width * math.sin(player.angle)))
+
+    pygame.draw.rect(disp, pygame.Color('red'), (int(player.x) // 10, int(player.y) // 10, 5, 5))
+    '''pygame.draw.line(disp, pygame.Color('red'), player.pos, (player.x + st.width * math.cos(player.angle),
+                                                             player.y + st.width * math.sin(player.angle)))'''
     for x, y in worlds:
-        pygame.draw.rect(disp, (0, 255, 0), (x, y, 100, 100), 2)
+        pygame.draw.rect(disp, (0, 255, 0), (x // 10, y // 10, 10, 10), 2)
     
     pygame.display.flip()
     clock.tick(st.fps)
