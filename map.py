@@ -1,6 +1,7 @@
 import pygame
+from mazegen import generate
 
-tx_map = [
+'''tx_map = [
     '1111111111111111',
     '1000000000111001',
     '1000000000000001',
@@ -9,7 +10,8 @@ tx_map = [
     '1111100000000001',
     '1111100000000001',
     '1111111111111111',
-]
+]'''
+tx_map = generate(17, 7)
 
 worlds = set()
 info_colis = []
