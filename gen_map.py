@@ -25,24 +25,12 @@ def way(level, start1, start2, finish1, finish2):
         well_pars = list(map(int, well_pars.split()))
         pars_level.append(well_pars)
 
-    x1, y1 = start1 - 1, start2 - 1
-    x2, y2 = finish1 - 1, finish2 - 1
+    x1, y1 = int(start1) - 1, int(start2) - 1
+    y2, x2 = int(finish1) - 1, int(finish2) - 1
     lab = opotunity(x1, y1, 1, y, x, pars_level)
 
     if lab[x2][y2] > 0:
-        print("Mozhet")
+        return True
     else:
-        print("Ne mozhet")
+        return False
         
-tx_map = [
-    '1111111111111111',
-    '1000000000111001',
-    '1000000000000001',
-    '1000011111000001',
-    '1000000000000001',
-    '1111100000000001',
-    '1111100000000001',
-    '1111111111111111',
-]
-
-way(tx_map, 2, 2, 15, 7)
