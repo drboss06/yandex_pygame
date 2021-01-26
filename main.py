@@ -1,25 +1,15 @@
 import math
-
 import pygame
 import pygame.gfxdraw
-
 import setings as st
 from map import info_colis, worlds
-from spriteobjects import *
+from random import randint
 
 pygame.init()
 disp = pygame.display.set_mode((st.width, st.height))
 clock = pygame.time.Clock()
 running = True
-sprites = Sprites()
-
-
-def world(world_objects):
-    for obj in sorted(world_objects, key=lambda n: n[0], reverse=True):
-        if obj[0]:
-            _, object, object_pos = obj
-            disp.blit(object, object_pos)
-
+tab = False
 
 class Draw:
     def __init__(self):
@@ -29,9 +19,28 @@ class Draw:
         self.texArray = pygame.PixelArray(self.well)
         self.dirX, self.dirY = 1.0, 0.0
         self.planeX, self.planeY = 0.0, 0.66
+        self.mat = randint(1, 20)
+
+    def start_screen(self):
+        intro_text = ['СПАСИБО ЗА 100 БАЛЛОВ','',
+                        'Делали эту хуйню' if self.mat < 3 else 'Делали эту фигню',
+                        'Zeldini, sadfun, ArtiArtem']
+
+
+        fon = pygame.transform.scale(pygame.image.load('fon.png'), (st.width, st.height))
+        disp.blit(fon, (0, 0))
+        font = pygame.font.Font(None, 30)
+        text_coord = 50
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('black'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            disp.blit(string_rendered, intro_rect)
     
     def ray_cast(self, player, disp, player_pos, player_angle):
-        walls = []
         si = math.sin(st.player_angle)
         co = math.cos(st.player_angle)
         cur_a = player_angle - st.half_fov
@@ -65,15 +74,14 @@ class Draw:
                         ofset = int(ofset) % 100 * self.magicvar
                         well_col = self.well.subsurface(ofset * st.tx_scale, 0, st.tx_scale,
                                                         st.tx_hight)
-                        well_col = pygame.transform.scale(well_col, (st.scale, pro))
+                        well_col = pygame.transform.scale(well_col, (st.tx_scale, pro))
+                        
                         disp.blit(well_col, (i * st.scale, st.half_height - pro // 2))
                         pygame.gfxdraw.box(disp, pygame.Rect(i * st.scale, st.half_height - pro // 2,
-                                                             st.scale, pro), (0, 0, 0, 255 - col))
-                        wall_pos = (i * st.scale, st.half_height - pro // 2)
-                        walls.append((j, well_col, wall_pos))
+                                                             st.scale + 2, pro),
+                                           (0, 0, 0, 255 - int(col)))
                         break
             cur_a += st.delta_angle
-        world(walls + [obj.object_locate(player, walls) for obj in sprites.list_of_objects])
 
 
 class Player:
@@ -103,37 +111,25 @@ class Player:
         
         if difference:
             self.angle += difference / 100
-        if pres[pygame.K_w]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0)
+        if pres[pygame.K_w]: 
             dy = st.player_speed * si
             dx = st.player_speed * co
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
-        if pres[pygame.K_s]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0)
+        if pres[pygame.K_s]: 
             dy = -st.player_speed * si
             dx = -st.player_speed * co
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
         if pres[pygame.K_d]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0)
             dy = st.player_speed * co
             dx = -st.player_speed * si
             if self.colis(dx, dy):
                 self.x += dx
                 self.y += dy
-        if pres[pygame.K_a]:
-            xf, yf = self.pos
-            if xf // 100 == 15 and yf // 100 == 5:
-                exit(0)
+        if pres[pygame.K_a]: 
             dy = -st.player_speed * co
             dx = st.player_speed * si
             if self.colis(dx, dy):
@@ -150,6 +146,9 @@ draw = Draw()
 
 while running:
     for event in pygame.event.get():
+        xf, yf = player.pos
+        if xf // 100 == st.maze_length - 2 and yf // 100 == st.maze_width - 2:
+            running = False
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYUP:
@@ -161,18 +160,46 @@ while running:
             if event.key == pygame.K_e:
                 draw.magicvar = round(-0.1 + draw.magicvar, 2)
             print(draw.magicvar)
+            if event.key == pygame.K_TAB:
+                tab = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_TAB:
+                tab = True
+
     player.movement()
     disp.fill(pygame.Color('black'))
     
     pygame.draw.rect(disp, (0, 186, 255), (0, 0, st.width, st.half_width))
     pygame.draw.rect(disp, (40, 40, 40), (0, st.half_height, st.width, st.half_width))
     draw.ray_cast(player, disp, player.pos, player.angle)
+
+    if tab:
+        pygame.draw.rect(disp, pygame.Color('red'), (int(player.x) // 10, int(player.y) // 10, 5, 5))
+        for x, y in worlds:
+            if x // 100 == st.maze_length - 1 and y // 100 == st.maze_width - 1:
+                pygame.draw.rect(disp, (255, 0, 0), (x // 10, y // 10, 10, 10))
+            else:
+                pygame.draw.rect(disp, (0, 255, 0), (x // 10, y // 10, 10, 10), 2)
     
-    pygame.draw.rect(disp, pygame.Color('red'), (int(player.x) // 10, int(player.y) // 10, 5, 5))
-    '''pygame.draw.line(disp, pygame.Color('red'), player.pos, (player.x + st.width * math.cos(player.angle),
-                                                             player.y + st.width * math.sin(player.angle)))'''
-    for x, y in worlds:
-        pygame.draw.rect(disp, (0, 255, 0), (x // 10, y // 10, 10, 10), 2)
-    
+    pygame.display.flip()
+    clock.tick(st.fps)
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+            if event.key == pygame.K_q:
+                draw.magicvar = round(0.1 + draw.magicvar, 2)
+            if event.key == pygame.K_e:
+                draw.magicvar = round(-0.1 + draw.magicvar, 2)
+
+
+    disp.fill(pygame.Color('black'))
+
+    draw.start_screen()
     pygame.display.flip()
     clock.tick(st.fps)
