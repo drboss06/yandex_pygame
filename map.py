@@ -13,7 +13,10 @@ tx_map = [
 
 worlds = set()
 info_colis = []
+mapGrid =[]
+mapBoundX, mapBoundY = len(tx_map[0]), len(tx_map)
 for i, j in enumerate(tx_map):
+    mapGrid.append(list(map(int, j)))
     for k, n in enumerate(j):
         if n == '1':
             worlds.add((k * 100, i * 100))
