@@ -5,11 +5,10 @@ from setings import *
 class Sprites:
     def __init__(self):
         self.sprite_types = {
-            'pedestal': pygame.image.load('0.png').convert_alpha(),
             'portal': pygame.image.load('portal.png').convert_alpha(),
         }
         self.list_of_objects = [
-            SpriteObject(self.sprite_types['portal'], True, (8.8, 2.5), 0.2, 2),
+            SpriteObject(self.sprite_types['portal'], True, (1.5, 1.5), 0.2, 2),
         ]
 
 TILE = 100

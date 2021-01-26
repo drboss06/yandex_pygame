@@ -4,28 +4,39 @@ import pygame.gfxdraw
 import setings as st
 from map import info_colis, worlds
 from random import randint
+from spriteobjects import *
 
 pygame.init()
 disp = pygame.display.set_mode((st.width, st.height))
 clock = pygame.time.Clock()
 running = True
 tab = False
+sprites = Sprites()
+
+
+def mapping(a, b):
+    return (a // st.TILE) * st.TILE, (b // st.TILE) * st.TILE
+
+
+def world(world_objects):
+    for obj in sorted(world_objects, key=lambda n: n[0], reverse=True):
+        if obj[0]:
+            d, object, object_pos = obj
+            disp.blit(object, object_pos)
+            pro = (st.half_height - object_pos[1])*2
+            col = 255 / (1 + d * d * 0.00002)
+            pygame.gfxdraw.box(disp, pygame.Rect(object_pos[0], object_pos[1], st.scale, pro+1), (0, 0, 0, 255 - int(col)))
+
 
 class Draw:
     def __init__(self):
-        
-        self.magicvar = 1
-        self.well = pygame.image.load('img1.png').convert()
-        self.texArray = pygame.PixelArray(self.well)
-        self.dirX, self.dirY = 1.0, 0.0
-        self.planeX, self.planeY = 0.0, 0.66
+        self.textures = {'1': pygame.image.load('img1.png').convert()}
         self.mat = randint(1, 20)
 
     def start_screen(self):
         intro_text = ['СПАСИБО ЗА 100 БАЛЛОВ','',
                         'Делали эту хуйню' if self.mat < 3 else 'Делали эту фигню',
                         'Zeldini, sadfun, ArtiArtem']
-
 
         fon = pygame.transform.scale(pygame.image.load('fon.png'), (st.width, st.height))
         disp.blit(fon, (0, 0))
@@ -39,49 +50,51 @@ class Draw:
             intro_rect.x = 10
             text_coord += intro_rect.height
             disp.blit(string_rendered, intro_rect)
-    
+
     def ray_cast(self, player, disp, player_pos, player_angle):
-        si = math.sin(st.player_angle)
-        co = math.cos(st.player_angle)
+        walls = []
         cur_a = player_angle - st.half_fov
         xo, yo = player_pos
-        k = 0
-        for i in range(st.num_rays):
+        xm, ym = mapping(xo, yo)
+        for ray in range(st.num_rays):
             si = math.sin(cur_a)
             co = math.cos(cur_a)
-            if not si:
-                si = 1 * 10 ** -15
-            
-            if not co:
-                co = 1 * 10 ** -15
-            k += 1
-            for j in range(st.max_depth):
-                varx = xo + j * co
-                vary = yo + j * si
-                de_v = (varx - xo) / co
-                de_h = (vary - yo) / si
-                yv = yo + de_v * si
-                xh = xo + de_h * co
-                if (varx // 100 * 100, vary // 100 * 100) in worlds:
-                    j *= math.cos(player_angle - cur_a)
-                    if j != 0:
-                        pro = int(st.proj_co / j)
-                        col = 255 / (1 + j * j * 0.00002)
-                        if de_h <= de_v:
-                            ofset = yv
-                        else:
-                            ofset = xh
-                        ofset = int(ofset) % 100 * self.magicvar
-                        well_col = self.well.subsurface(ofset * st.tx_scale, 0, st.tx_scale,
-                                                        st.tx_hight)
-                        well_col = pygame.transform.scale(well_col, (st.tx_scale, pro))
-                        
-                        disp.blit(well_col, (i * st.scale, st.half_height - pro // 2))
-                        pygame.gfxdraw.box(disp, pygame.Rect(i * st.scale, st.half_height - pro // 2,
-                                                             st.scale + 2, pro),
-                                           (0, 0, 0, 255 - int(col)))
-                        break
+            si = si if si else 0.000001
+            co = co if co else 0.000001
+            x, dx = (xm + st.TILE, 1) if co >= 0 else (xm, -1)
+            for _ in range(0, st.width, st.TILE):
+                depth_v = (x - xo) / co
+                yv = yo + depth_v * si
+                tile_v = mapping(x + dx, yv)
+                if tile_v in worlds:
+                    texture_v = worlds[tile_v]
+                    break
+                x += dx * st.TILE
+            y, dy = (ym + st.TILE, 1) if si >= 0 else (ym, -1)
+            for _ in range(0, st.height, st.TILE):
+                depth_h = (y - yo) / si
+                xh = xo + depth_h * co
+                tile_h = mapping(xh, y + dy)
+                if tile_h in worlds:
+                    texture_h = worlds[tile_h]
+                    break
+                y += dy * st.TILE
+        
+            dep, ofset, texture = (depth_v, yv, texture_v) if depth_v < depth_h else (
+                depth_h, xh, texture_h)
+        
+            ofset = int(ofset) % st.TILE
+            dep *= math.cos(player_angle - cur_a)
+            # dep = max(dep, 0.00001)
+            # pro = int(st.proj_co / dep)
+            pro = min(int(st.proj_co / dep), 2 * st.height)
+            well_col = self.textures[texture].subsurface(ofset * st.tx_scale, 0, st.tx_scale,
+                                                         st.tx_hight)
+            well_col = pygame.transform.scale(well_col, (st.scale, pro))
+            wall_pos = (ray * st.scale, st.half_height - pro // 2)
+            walls.append((dep, well_col, wall_pos))
             cur_a += st.delta_angle
+        world(walls + [obj.object_locate(player, walls) for obj in sprites.list_of_objects])
 
 
 class Player:
@@ -154,12 +167,6 @@ while running:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            if event.key == pygame.K_q:
-                draw.magicvar = round(0.1 + draw.magicvar, 2)
-            print(draw.magicvar)
-            if event.key == pygame.K_e:
-                draw.magicvar = round(-0.1 + draw.magicvar, 2)
-            print(draw.magicvar)
             if event.key == pygame.K_TAB:
                 tab = False
         if event.type == pygame.KEYDOWN:
@@ -180,7 +187,7 @@ while running:
                 pygame.draw.rect(disp, (255, 0, 0), (x // 10, y // 10, 10, 10))
             else:
                 pygame.draw.rect(disp, (0, 255, 0), (x // 10, y // 10, 10, 10), 2)
-    
+        x, y = 0, 0
     pygame.display.flip()
     clock.tick(st.fps)
 
