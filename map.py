@@ -1,12 +1,10 @@
 import pygame
 from mazegen import generate
 from gen_map import way
+from setings import maze_length, maze_width
 
-while True:
-    
-    tx_map = generate(25, 15)
-    if way(tx_map, 2, 2, 24, 14):
-        break
+tx_map = generate(maze_length, maze_width)
+
 
 
 worlds = set()
