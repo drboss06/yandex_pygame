@@ -14,12 +14,16 @@ dist = num_rays / (2 * math.tan((half_fov)))
 proj_co = 3 * dist * 100
 scale = width // num_rays
 
+DOUBLE_PI = math.tau
+CENTER_RAY = num_rays//2 - 1
+FAKE_RAYS = 100
+
 tx_width = 1200
 tx_hight = 1200
 tx_scale = tx_width // 100
 
-player_pos = (112, 112)
+player_pos = (half_width, half_height + 20)
 player_angle = 0
 player_speed = 2
 
-fps = 30
+fps = 60
