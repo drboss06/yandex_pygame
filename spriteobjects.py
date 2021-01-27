@@ -8,7 +8,7 @@ class Sprites:
             'portal': pygame.image.load('portal.png').convert_alpha(),
         }
         self.list_of_objects = [
-            SpriteObject(self.sprite_types['portal'], True, (1.5, 1.5), 0.2, 2),
+            SpriteObject(self.sprite_types['portal'], True, (1.5, 1.5), 0.1, 1),
         ]
 
 TILE = 100

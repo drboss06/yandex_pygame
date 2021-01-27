@@ -28,8 +28,8 @@ tx_scale = tx_width // TILE
 fps = 60
 
 # Maze
-maze_length = 33
-maze_width = 33
+maze_length = 7
+maze_width = 3
 
 player_pos = (112, 112)
 player_angle = 0

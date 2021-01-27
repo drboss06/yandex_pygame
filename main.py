@@ -13,6 +13,7 @@ running = True
 tab = False
 sprites = Sprites()
 
+txheight ={'1': 1200, '2': 1000, '3': 1200}
 
 def mapping(a, b):
     return (a // st.TILE) * st.TILE, (b // st.TILE) * st.TILE
@@ -30,7 +31,9 @@ def world(world_objects):
 
 class Draw:
     def __init__(self):
-        self.textures = {'1': pygame.image.load('img1.png').convert()}
+        self.textures = {'1': pygame.image.load('img1.png').convert(),
+                         '2': pygame.image.load('portal.png').convert(),
+                         '3': pygame.image.load('egg.png').convert()}
         self.mat = randint(1, 20)
 
     def start_screen(self):
@@ -88,8 +91,8 @@ class Draw:
             # dep = max(dep, 0.00001)
             # pro = int(st.proj_co / dep)
             pro = min(int(st.proj_co / dep), 2 * st.height)
-            well_col = self.textures[texture].subsurface(ofset * st.tx_scale, 0, st.tx_scale,
-                                                         st.tx_hight)
+            well_col = self.textures[texture].subsurface(ofset * txheight[texture]//TILE, 0, txheight[texture]//TILE,
+                                                         txheight[texture])
             well_col = pygame.transform.scale(well_col, (st.scale, pro))
             wall_pos = (ray * st.scale, st.half_height - pro // 2)
             walls.append((dep, well_col, wall_pos))
