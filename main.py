@@ -155,6 +155,7 @@ class Player:
             self.angle -= 0.06
         if pres[pygame.K_RIGHT]:
             self.angle += 0.06
+        self.angle %= st.DOUBLE_PI
 
 
 player = Player()
