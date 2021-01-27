@@ -11,6 +11,7 @@ def generate(length: int, width: int) -> List[str]:
 
     maze[1][1] = '0'
     q = deque([(1, 1)])
+    easteregg = False
 
     while q:
         x, y = q.pop()
@@ -28,6 +29,8 @@ def generate(length: int, width: int) -> List[str]:
             maze[y2][x2] = '0'
 
             q.append((x1, y1))
+        elif not easteregg:
+            maze[y][x] = '3'
 
     return list(map("".join, maze))
 
