@@ -30,6 +30,7 @@ def generate(length: int, width: int) -> List[str]:
 
             q.append((x1, y1))
         elif not easteregg:
+            easteregg = True
             maze[y][x] = '3'
 
     return list(map("".join, maze))
